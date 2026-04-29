@@ -1,5 +1,5 @@
 {
-  "name": "My workflow 3",
+  "name": "Webhook",
   "nodes": [
     {
       "parameters": {
@@ -12,7 +12,7 @@
       "typeVersion": 2.1,
       "position": [
         0,
-        0
+        48
       ],
       "id": "a6d36cbd-019e-41ea-ad1e-83aea296ca39",
       "name": "Webhook",
@@ -26,8 +26,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        464,
-        -128
+        448,
+        -48
       ],
       "id": "f8dff8e8-0d9b-45b4-a5f9-6abc24651f1a",
       "name": "Code in JavaScript"
@@ -38,7 +38,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        240
+        368
       ],
       "id": "01c15ed9-ecfb-4b4e-9c4d-240ac25ddf25",
       "name": "When clicking ‘Execute workflow’"
@@ -58,8 +58,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        208,
-        240
+        224,
+        368
       ],
       "id": "6008c927-eb4e-4af0-858d-bd51d9e8f427",
       "name": "Delete a data table"
@@ -98,8 +98,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        416,
-        240
+        448,
+        368
       ],
       "id": "749407d8-6d40-491f-918c-4730d8608fa4",
       "name": "Create a data table"
@@ -194,8 +194,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        624,
-        -128
+        672,
+        -48
       ],
       "id": "3e7be534-12cd-499f-b842-f030c69a0b2b",
       "name": "Insert row",
@@ -215,37 +215,6 @@
       ],
       "id": "9648fb91-8638-424d-9371-0c2176334d2b",
       "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "respondWith": "noData",
-        "options": {
-          "responseCode": 201
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        848,
-        -144
-      ],
-      "id": "46ec719f-03b2-4e07-98f7-3249a2785d24",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
-        "options": {
-          "responseCode": 500
-        }
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        848,
-        -32
-      ],
-      "id": "c33e337f-7886-4c02-8da7-44e2bf2b32d8",
-      "name": "Respond to Webhook1"
     },
     {
       "parameters": {
@@ -288,8 +257,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        256,
-        -48
+        224,
+        48
       ],
       "id": "6831acd5-5c78-4b1b-b42e-cb21aa207420",
       "name": "Edit Fields",
@@ -297,7 +266,42 @@
     },
     {
       "parameters": {
-        "respondWith": "noData",
+        "respondWith": "json",
+        "responseBody": "={\n\"id\": \"{{ $json.id }}\",\n\"name\": \"{{ $json.name }}\"\n}",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1120,
+        48
+      ],
+      "id": "46ec719f-03b2-4e07-98f7-3249a2785d24",
+      "name": "Success"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        -144
+      ],
+      "id": "c33e337f-7886-4c02-8da7-44e2bf2b32d8",
+      "name": "Insert Error"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"error\": \"problem with type\"\n}",
         "options": {
           "responseCode": 400
         }
@@ -305,11 +309,39 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        848,
-        96
+        448,
+        144
       ],
       "id": "048bd01c-6221-45f3-8ec9-b09362f7c350",
-      "name": "Respond to Webhook2"
+      "name": "Type Error"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "bkGx6CwUyf33Xvpj",
+          "mode": "list",
+          "cachedResultName": "client_table",
+          "cachedResultUrl": "/projects/OgaGKJGZF9tGKrFK/datatables/bkGx6CwUyf33Xvpj"
+        },
+        "matchType": "=allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        48
+      ],
+      "id": "d0a9fa85-62c5-4ad8-985c-bc13917f928f",
+      "name": "Get row(s)"
     }
   ],
   "pinData": {},
@@ -362,14 +394,14 @@
       "main": [
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Get row(s)",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Respond to Webhook1",
+            "node": "Insert Error",
             "type": "main",
             "index": 0
           }
@@ -387,7 +419,18 @@
         ],
         [
           {
-            "node": "Respond to Webhook2",
+            "node": "Type Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Success",
             "type": "main",
             "index": 0
           }
@@ -400,7 +443,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "ca9b3bce-f658-4e8a-bc1b-d2f283ac7191",
+  "versionId": "be05ce05-6041-4dd4-93fe-bcb7a2e6ab4c",
   "meta": {
     "instanceId": "f0941c8674c7e69d3f6f91464a85dda4fffafbf8ecce83891c12525cbb0c4d29"
   },
