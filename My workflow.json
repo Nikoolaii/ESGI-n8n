@@ -1,0 +1,181 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e8c95d90-1d86-4f9f-939a-02edf7d81f54",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { name: \"Alice\", age: 17 } },\n  { json: { name: \"Bob\", age: 25 } },\n  { json: { name: \"Charlie\", age: 16 } },\n  { json: { name: \"Alice\", age: 17 } },\n  { json: { name: \"Bob\", age: 25 } },\n  { json: { name: \"Charlie\", age: 16 } },\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8925f300-60ad-4bb6-bfbf-361649f15b60",
+      "name": "Data Mok"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "\n$json.adult = $json.age >= 18;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "34693c91-b8de-4e18-b905-8dd7f270f490",
+      "name": "IsAdult ? "
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "name, age, adult",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "f97497b6-dd6e-4e64-a723-e82a7251ea02",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const now = new Date();\n\n$json.timestamp = now.toISOString('fr-FR');\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -80
+      ],
+      "id": "36aa6aad-16c4-432a-9a61-06e79a2ece68",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const now = new Date();\n\n$json.timestamp = now.toISOString('fr-FR');\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        48
+      ],
+      "id": "f9922983-afe6-4ff5-bb1d-9a4f3f2bb6b4",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "bc4c65d9-b462-4561-a4c0-6a788e34e94e",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Data Mok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Mok": {
+      "main": [
+        [
+          {
+            "node": "IsAdult ? ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IsAdult ? ": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "080008ab-7fa3-4074-be1c-428e276e114a",
+  "meta": {
+    "instanceId": "f0941c8674c7e69d3f6f91464a85dda4fffafbf8ecce83891c12525cbb0c4d29"
+  },
+  "id": "qwpZZNACvSxsrzU8",
+  "tags": []
+}

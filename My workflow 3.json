@@ -1,0 +1,409 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "check_age",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a6d36cbd-019e-41ea-ad1e-83aea296ca39",
+      "name": "Webhook",
+      "webhookId": "b2f9f56b-a0a2-47c2-badd-a33935d7bee7"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "$json.is_adult = $json.age >= 18;\n\nreturn $input.item;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -128
+      ],
+      "id": "f8dff8e8-0d9b-45b4-a5f9-6abc24651f1a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ],
+      "id": "01c15ed9-ecfb-4b4e-9c4d-240ac25ddf25",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "delete",
+        "dataTableId": {
+          "__rl": true,
+          "value": "3AhQUVGzzm4K5EWq",
+          "mode": "list",
+          "cachedResultName": "client_table",
+          "cachedResultUrl": "/projects/OgaGKJGZF9tGKrFK/datatables/3AhQUVGzzm4K5EWq"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        240
+      ],
+      "id": "6008c927-eb4e-4af0-858d-bd51d9e8f427",
+      "name": "Delete a data table"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "client_table",
+        "columns": {
+          "column": [
+            {
+              "name": "age",
+              "type": "number"
+            },
+            {
+              "name": "name"
+            },
+            {
+              "name": "message"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "source"
+            },
+            {
+              "name": "is_adult",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        240
+      ],
+      "id": "749407d8-6d40-491f-918c-4730d8608fa4",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "bkGx6CwUyf33Xvpj",
+          "mode": "list",
+          "cachedResultName": "client_table",
+          "cachedResultUrl": "/projects/OgaGKJGZF9tGKrFK/datatables/bkGx6CwUyf33Xvpj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_adult": "={{ $json.body.is_adult }}",
+            "name": "={{ $json.body.name }}",
+            "email": "={{ $json.body.email }}",
+            "message": "={{ $json.body.message }}",
+            "age": "={{ $json.body.age }}",
+            "source": "={{ $json.body.source }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "age",
+              "displayName": "age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is_adult",
+              "displayName": "is_adult",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        -128
+      ],
+      "id": "3e7be534-12cd-499f-b842-f030c69a0b2b",
+      "name": "Insert row",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "```shell \ncurl -X POST \"http://localhost:5678/webhook-test/check_age\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"name\": \"Alice Martin\",\n    \"email\": \"alice@example.com\",\n    \"message\": \"Je veux un devis pour un site vitrine\",\n    \"age\": 15,\n    \"source\": \"landing page\"\n  }'\n```",
+        "height": 192,
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        0
+      ],
+      "id": "9648fb91-8638-424d-9371-0c2176334d2b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 201
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        848,
+        -144
+      ],
+      "id": "46ec719f-03b2-4e07-98f7-3249a2785d24",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        848,
+        -32
+      ],
+      "id": "c33e337f-7886-4c02-8da7-44e2bf2b32d8",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c279503a-10ba-46e6-a1da-348374d2f17a",
+              "name": "body.name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "8b864ad3-dd6e-47fc-bd69-825a3ed8bf45",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "b4cc2203-e883-4868-93c6-6c47c8f5a363",
+              "name": "body.message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "6da0aebb-0cae-438c-b1c1-c2476b695fff",
+              "name": "body.age",
+              "value": "={{ $json.body.age }}",
+              "type": "number"
+            },
+            {
+              "id": "549e8ef3-9c66-4932-b5d4-642bd7e46d71",
+              "name": "body.source",
+              "value": "={{ $json.body.source }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        -48
+      ],
+      "id": "6831acd5-5c78-4b1b-b42e-cb21aa207420",
+      "name": "Edit Fields",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        848,
+        96
+      ],
+      "id": "048bd01c-6221-45f3-8ec9-b09362f7c350",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Delete a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a data table": {
+      "main": [
+        [
+          {
+            "node": "Create a data table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ca9b3bce-f658-4e8a-bc1b-d2f283ac7191",
+  "meta": {
+    "instanceId": "f0941c8674c7e69d3f6f91464a85dda4fffafbf8ecce83891c12525cbb0c4d29"
+  },
+  "id": "PEKJE18fMlwZa2rw",
+  "tags": []
+}
