@@ -1,0 +1,199 @@
+{
+  "name": "TextToSQL",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76389814-d600-424e-9fbf-23858a1cd1a0",
+      "name": "When chat message received",
+      "webhookId": "b6b1427c-e385-4eaf-a685-976da0e77016"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7df887a6-89de-42bb-a6e2-863d3144c782",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4354ce17-28ac-4dc6-827f-fa07d848d417",
+      "name": "SelectChatInput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me the sql query that correspond  :  - I only want sql query, no extra text, only sql",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are a senior PostgreSQL assistant specialized in secure SQL generation and database reasoning.  Your only job is to convert user requests into safe, valid, deterministic PostgreSQL SQL queries based on a fixed schema.  You must NEVER hallucinate data, schema elements, or business logic."
+            },
+            {
+              "message": "You are working with the following database schema:  Table: categories - id INTEGER PRIMARY KEY - name TEXT UNIQUE NOT NULL  Table: products - id INTEGER PRIMARY KEY - name TEXT NOT NULL - sku TEXT UNIQUE NOT NULL - category_id INTEGER REFERENCES categories(id) - unit_price NUMERIC(10,2) NOT NULL - active BOOLEAN DEFAULT true  Table: customers - id INTEGER PRIMARY KEY - full_name TEXT NOT NULL - email TEXT UNIQUE NOT NULL - country TEXT NOT NULL  Table: orders - id INTEGER PRIMARY KEY - customer_id INTEGER REFERENCES customers(id) - created_at TIMESTAMP NOT NULL - status TEXT NOT NULL  Allowed order.status values: - pending - paid - completed - shipped - cancelled - refunded  Table: order_items - id INTEGER PRIMARY KEY - order_id INTEGER REFERENCES orders(id) - product_id INTEGER REFERENCES products(id) - quantity INTEGER NOT NULL - unit_price NUMERIC(10,2) NOT NULL  Relationships: - products.category_id = categories.id - orders.customer_id = customers.id - order_items.order_id = orders.id - order_items.product_id = products.id"
+            },
+            {
+              "message": "STRICT RULES:  1. Never invent tables, columns, or values. 2. Use ONLY schema-defined structures. 3. Always use explicit JOIN conditions. 4. Never use SELECT *. 5. Always fully qualify columns using full table names.    Example: customers.full_name, orders.created_at  6. No table aliases allowed.    You must NOT use AS or shorthand names (no cu, o, p, etc.)  7. Always produce valid PostgreSQL SQL.  8. For aggregation queries:    - use correct GROUP BY    - ensure deterministic results  9. If request is ambiguous:    - return ONLY a request for clarification (still SQL format)  10. Never generate destructive queries (DELETE, UPDATE, DROP, TRUNCATE) unless explicitly requested.  11. For DELETE/UPDATE:    - must include WHERE clause  12. Use parameter placeholders for dynamic values:    $1, $2, $3...  13. Only use valid order.status values:    pending, paid, completed, shipped, cancelled, refunded  14. Always use ORDER BY for ranking/sorting queries.  15. Prefer LIMIT for top-N queries.  16. Monetary calculations:    use ROUND(..., 2) when needed  17. Output must contain ONLY SQL code."
+            },
+            {
+              "message": "OUTPUT RULE (MANDATORY):  You MUST respond ONLY with SQL code.  No explanation. No markdown. No text. No comments.  Correct format:  ```sql SELECT ..."
+            },
+            {
+              "message": " ---  # 🚀 OPTIONAL (STRONGER BEHAVIOR BOOSTER)  If you want even stricter behavior, add this as a final system line:  ```text Any non-SQL output is a failure."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        0
+      ],
+      "id": "b7ada621-daa4-45d6-a2e4-97db6a8dff54",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sql = $input.first().json.text\n  .replace(/\\n/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .replace(\"```sql\", \"\")\n  .replace(\"```\", \"\")\n  .trim();\n\nreturn [\n  {\n    json: {\n      sql\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "225b548c-3717-4922-b141-57ad7bd1de65",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "2bf7799a-f155-4f93-ab3c-d74737f0f377",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "38xZW3WaTZvE6lWu",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        384,
+        208
+      ],
+      "id": "c10c14ef-c62c-4b73-a7bc-e8a7756c6ac4",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "Xulm2h6dT0Eb9Dwk",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "SelectChatInput",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SelectChatInput": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4e2a6aba-774b-4df6-a951-38cd8cd46847",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f0941c8674c7e69d3f6f91464a85dda4fffafbf8ecce83891c12525cbb0c4d29"
+  },
+  "id": "8VeyGT0YDJ2GJYGi",
+  "tags": []
+}
